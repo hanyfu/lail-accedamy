@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { api } from '@/lib/api';
 import type { HomeContent } from '@/lib/types';
 
@@ -72,23 +72,30 @@ export default function HomePage() {
     [t],
   );
 
+  const defaultHomeRef = useRef(defaultHome);
+  useEffect(() => {
+    defaultHomeRef.current = defaultHome;
+  }, [defaultHome]);
+
   useEffect(() => {
     let mounted = true;
+    console.log('🚀 Fetching site settings...');
     api
       .getPublicSiteSettings()
       .then((data) => {
         if (!mounted) return;
-        setHome(mergeHomeContent(data.homeContent, defaultHome));
+        setHome(mergeHomeContent(data.homeContent, defaultHomeRef.current));
       })
-      .catch(() => {
+      .catch((err) => {
         if (!mounted) return;
-        setHome(defaultHome);
+        console.error('❌ Failed to fetch site settings:', err);
+        setHome(defaultHomeRef.current);
       });
 
     return () => {
       mounted = false;
     };
-  }, [defaultHome]);
+  }, []);
 
   const content = home || defaultHome;
 
