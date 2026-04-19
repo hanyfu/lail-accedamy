@@ -1,0 +1,11 @@
+[build]
+  # Build the web application specifically
+  command = "turbo run build --filter=web"
+  # The directory where Next.js outputs the build
+  publish = "apps/web/.next"
+  # Use the root of the repo as the base for turbo
+  base = "/"
+
+[[plugins]]
+  # Automatically handle Next.js deployment details
+  package = "@netlify/plugin-nextjs"
